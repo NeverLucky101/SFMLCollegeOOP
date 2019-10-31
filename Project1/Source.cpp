@@ -1,36 +1,22 @@
 #include "SFML/include/SFML/Graphics.hpp"
 
 
-sf::Vector2f viewSize(1024, 768);
-sf::VideoMode vm(viewSize.x, viewSize.y);
-sf::RenderWindow window(vm, "Hello, SFML", sf::Style::Default);
 
 
 int main() {
 
 	//initialize game object
 
-	//rectangle
-	sf::RectangleShape rect(sf::Vector2f(500,300));
-	rect.setFillColor(sf::Color::White);
-	rect.setPosition(viewSize.x / 2, viewSize.y / 2);
-	rect.setOrigin(sf::Vector2f(rect.getSize().x/2, rect.getSize().y/2));
+	sf::RenderWindow window(sf::VideoMode(640, 480), "Bouncing Mushroom");
 
-	//circle
-	sf::CircleShape circ(100);
-	circ.setFillColor(sf::Color::Red);
-	circ.setPosition(viewSize.x / 2, viewSize.y / 2);
-	circ.setOrigin(circ.getRadius(), circ.getRadius());
+	sf::Texture mushroomTexture;
+	mushroomTexture.loadFromFile("deps/images/Mushroom.png");
+	sf::Sprite mushroom(mushroomTexture);
+	sf::Vector2u size = mushroomTexture.getSize();
+	mushroom.setOrigin(size.x / 2, size.y / 2);
+	sf::Vector2f incriment(0.1f, 0.1f);
 
-	//triangle
-	sf::ConvexShape tri;
-	tri.setPointCount(3);
-	tri.setPoint(0,sf::Vector2f(-100,0));
-	tri.setPoint(1, sf::Vector2f(0, -200));
-	tri.setPoint(2, sf::Vector2f(100, 0));
-	tri.setFillColor(sf::Color::Blue);
-	tri.setPosition(viewSize.x / 2, viewSize.y / 2);
-
+	
 
 
 
@@ -40,13 +26,41 @@ int main() {
 	while (window.isOpen())
 	{
 		//Handle keyboard events
+		sf::Event event;
+
+		while (window.pollEvent(event)) 
+		{
+			if (event.type == sf::Event::Closed)
+			{
+				window.close();
+			}
+		}
+
 
 		//Update game objects
-		window.clear(sf::Color::Green);
+		if((mushroom.getPosition().x + (size.x / 2) > window.getSize().x && incriment.x > 0) || (mushroom.getPosition().x - (size.x / 2) < 0 && incriment.x < 0))
+		{
+			//reverse direction on the x axis
+			incriment.x = -incriment.x;
+			mushroom.setColor(sf::Color::Red);
+		}
+		if((mushroom.getPosition().y + (size.y / 2) > window.getSize().y && incriment.y > 0) || (mushroom.getPosition().y - (size.y / 2) < 0 && incriment.y < 0))
+		{
+			//reverse direction in the y axis
+			incriment.y = -incriment.y;
+			mushroom.setColor(sf::Color::White);
+
+		}
+
+		mushroom.setPosition(mushroom.getPosition() + incriment);
+
+		window.clear(sf::Color::Black);
+
+
 		//Render game objects
-		window.draw(rect);
-		window.draw(circ);
-		window.draw(tri);
+
+		window.draw(mushroom);
+
 		window.display();
 	}
 
